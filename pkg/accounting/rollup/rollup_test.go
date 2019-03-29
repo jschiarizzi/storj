@@ -32,8 +32,8 @@ func TestRollupRaws(t *testing.T) {
 			err := planet.Satellites[0].DB.Accounting().SaveAtRestRaw(ctx, timestamp, timestamp, nodeData)
 			assert.NoError(t, err)
 
-			err = planet.Satellites[0].DB.Accounting().SaveBWRaw(ctx, timestamp, timestamp, bwTotals)
-			assert.NoError(t, err)
+			// err = planet.Satellites[0].DB.Accounting().SaveBWRaw(ctx, timestamp, timestamp, bwTotals)
+			// assert.NoError(t, err)
 
 			err = planet.Satellites[0].Accounting.Rollup.RollupRaws(ctx)
 			assert.NoError(t, err)

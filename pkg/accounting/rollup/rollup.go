@@ -19,16 +19,16 @@ type Config struct {
 	Interval time.Duration `help:"how frequently rollup should run" devDefault:"120s" default:"6h"`
 }
 
-// Rollup is the service for totalling data on storage nodes on daily intervals
-type Rollup struct { // TODO: rename to service
+// Service is the rollup service for totalling data on storage nodes on daily intervals
+type Service struct {
 	logger *zap.Logger
 	ticker *time.Ticker
 	db     accounting.DB
 }
 
 // New creates a new rollup service
-func New(logger *zap.Logger, db accounting.DB, interval time.Duration) *Rollup {
-	return &Rollup{
+func New(logger *zap.Logger, db accounting.DB, interval time.Duration) *Service {
+	return &Service{
 		logger: logger,
 		ticker: time.NewTicker(interval),
 		db:     db,
@@ -36,7 +36,7 @@ func New(logger *zap.Logger, db accounting.DB, interval time.Duration) *Rollup {
 }
 
 // Run the Rollup loop
-func (r *Rollup) Run(ctx context.Context) (err error) {
+func (r *Service) Run(ctx context.Context) (err error) {
 	r.logger.Info("Rollup service starting up")
 	defer mon.Task()(&ctx)(&err)
 	for {
@@ -53,7 +53,7 @@ func (r *Rollup) Run(ctx context.Context) (err error) {
 }
 
 // RollupRaws rolls up raw tally
-func (r *Rollup) RollupRaws(ctx context.Context) error {
+func (r *Service) RollupRaws(ctx context.Context) error {
 	// only Rollup new things - get LastRollup
 	var latestTally time.Time
 	lastRollup, err := r.db.LastTimestamp(ctx, accounting.LastRollup)
@@ -119,5 +119,10 @@ func (r *Rollup) RollupRaws(ctx context.Context) error {
 	if rolledUpRawsHaveBeenSaved {
 		return Error.Wrap(r.db.DeleteRawBefore(ctx, latestTally))
 	}
+	return nil
+}
+
+func (r *Service) rollupBW(ctx context.Context) error {
+	//TODO
 	return nil
 }
